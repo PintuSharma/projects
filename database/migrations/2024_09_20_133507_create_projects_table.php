@@ -15,7 +15,7 @@ return new class extends Migration
             $table->ulid('id');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->double('price',8,3)->nullable();
+            $table->double('price',8,2)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

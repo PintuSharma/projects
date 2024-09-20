@@ -10,30 +10,27 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProjectResource;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Interfaces\ProjectRepositoryInterface;
+use App\Services\ApiResponse;
 
 class ProjectController extends Controller
 {
+
+    private ProjectRepositoryInterface $projectRepository;
+
+    public function __construct(ProjectRepositoryInterface $projectRepository)
+    {
+        $this->projectRepository = $projectRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): JsonResponse
     {
-        try {
-            $projects = Project::paginate(10); // Display 10 projects per page
-            return ProjectResource::collection($projects)
-                ->additional([
-                    'meta' => [
-                        'total' => $projects->total(),
-                        'per_page' => $projects->perPage(),
-                        'current_page' => $projects->currentPage(),
-                        'last_page' => $projects->lastPage(),
-                        'next_page_url' => $projects->nextPageUrl(),
-                        'prev_page_url' => $projects->previousPageUrl(),
-                    ],
-                ]);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'Unable to fetch projects'], 500);
-        }
+        $data = $this->projectRepository->index();
+
+        return ApiResponse::sendResponse(ProjectResource::collection($data),'',200);
     }
     
 
@@ -59,12 +56,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        try {
-            return response()->json(new ProjectResource($project), 200);
-        } catch (Exception $ex) {
-            return response()->json(['error' => $ex->getMessage()], 404);
-        }
-
+        return ApiResponse::sendResponse(new ProjectResource($project),'',200);
     }
 
     /**
@@ -89,15 +81,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        DB::beginTransaction();
-        try {
-            $project->delete();
-            DB::commit();
-            return response()->json(null, 204);
-        } catch (Exception $ex) {
-            DB::rollBack();
-            return response()->json(['error' => $ex->getMessage()], 500);
-        }
-
+        $project->delete();
+        return ApiResponse::sendResponse('Product Delete Successful','',204);           
     }
 }
