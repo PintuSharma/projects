@@ -28,6 +28,7 @@ class ProjectController extends Controller
      */
     public function index(): JsonResponse
     {
+        echo 'hi';exit;
         $data = $this->projectRepository->index();
 
         return ApiResponse::sendResponse(ProjectResource::collection($data),'',200);
