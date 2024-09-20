@@ -12,15 +12,18 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Interfaces\ProjectRepositoryInterface;
 use App\Services\ApiResponse;
+use App\Services\MediaService;
 
 class ProjectController extends Controller
 {
 
     private ProjectRepositoryInterface $projectRepository;
 
-    public function __construct(ProjectRepositoryInterface $projectRepository)
+    protected $mediaService;
+    public function __construct(ProjectRepositoryInterface $projectRepository,MediaService $mediaService)
     {
         $this->projectRepository = $projectRepository;
+        $this->mediaService = $mediaService;
     }
 
     /**
@@ -28,7 +31,6 @@ class ProjectController extends Controller
      */
     public function index(): JsonResponse
     {
-        echo 'hi';exit;
         $data = $this->projectRepository->index();
 
         return ApiResponse::sendResponse(ProjectResource::collection($data),'',200);
@@ -42,12 +44,16 @@ class ProjectController extends Controller
     {
         DB::beginTransaction();
         try {
-            $project = Project::create($request->validated());
+            $project = $this->projectRepository->store($request->only('name','description','price'));
+
+            if($request->has('files')) {
+                    $this->mediaService->upload($request->file('files'),$project);
+            }
+
             DB::commit();
-            return response()->json(new ProjectResource($project), 201);
+            return ApiResponse::sendResponse(new ProjectResource($project),'Project created successfully.',201);
         } catch (Exception $ex) {
-            DB::rollBack();
-            return response()->json(['error' => $ex->getMessage()], 500);
+            return ApiResponse::rollback($ex);
         }
 
     }
@@ -67,12 +73,15 @@ class ProjectController extends Controller
     {
         DB::beginTransaction();
         try {
-            $project->update($request->validated());
+            $project = $this->projectRepository->update($request->only('name','description','price'),$project);
+            if($request->has('files')) {
+                $this->mediaService->upload($request->file('files'),$project);
+             }
             DB::commit();
-            return response()->json(new ProjectResource($project), 200);
+            return ApiResponse::sendResponse(new ProjectResource($project),'Project updated successfully',200);
+
         } catch (Exception $ex) {
-            DB::rollBack();
-            return response()->json(['error' => $ex->getMessage()], 500);
+            return ApiResponse::rollback($ex);
         }
 
     }

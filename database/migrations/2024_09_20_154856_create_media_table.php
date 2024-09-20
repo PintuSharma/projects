@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('media', function (Blueprint $table) {
-            $table->ulid('id');
+            $table->ulid('id')->primary();
             $table->ulidMorphs('media');
             $table->string('collection_name');
             $table->string('name');

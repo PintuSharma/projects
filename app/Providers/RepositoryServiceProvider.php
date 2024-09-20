@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Interfaces\MediaRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 use App\Interfaces\ProjectRepositoryInterface;
+use App\Repositories\MediaRepository;
 use App\Repositories\ProjectRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -15,6 +17,8 @@ class RepositoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(ProjectRepositoryInterface::class,ProjectRepository::class);
+        $this->app->bind(MediaRepositoryInterface::class,MediaRepository::class);
+
     }
 
     /**

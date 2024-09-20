@@ -3,33 +3,50 @@
 namespace App\Services;
 
 use App\Models\Media;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Interfaces\MediaRepositoryInterface;
 
-class MediaService {
-   
-    public function upload($file,$disk,$collectionName, $model)
+class MediaService
+{
+
+    /**
+     * Create a new class instance.
+     */
+
+    private $mediaRepositoryInterface;
+    public function __construct(MediaRepositoryInterface $mediaRepositoryInterface)
     {
-   
-        // Store the file
-
-        Storage::disk($disk)->putFileAs($collectionName, $file, basename($file));
-
-        // Create a media record
-        $media = Media::create([
-            'media_type' => get_class($model),
-            'media_id' => $model->id,
-            'collection_name' => $collectionName,
-            'name' => $file->getClientOriginalName(),
-            'file_name' => basename($file),
-            'mime_type' => $file->getMimeType(),
-            'disk' => $disk,
-            'size' => $file->getSize(),
-        ]);
-
-        return $media;
+        $this->mediaRepositoryInterface = $mediaRepositoryInterface;
     }
 
-    public function delete(Media $media)
+    public function upload($files, $model, $disk = 'public')
+    {
+
+        $files = is_array($files) ? $files : [$files];
+
+        foreach ($files as $key => $file) {
+            $collectionName = Str::snake(class_basename(get_class($model)));
+            $uniqueFileName = uniqid() . '.' . $file->getClientOriginalExtension();
+
+            Storage::disk($disk)->putFileAs("$collectionName/$model->id", $file, $uniqueFileName);
+
+            $mediaLibrary[] =  $this->mediaRepositoryInterface->store([
+                'media_type' => get_class($model),
+                'media_id' => $model->id,
+                'collection_name' => $collectionName,
+                'name' => $file->getClientOriginalName(),
+                'file_name' => $uniqueFileName,
+                'mime_type' => $file->getMimeType(),
+                'disk' => $disk,
+                'size' => $file->getSize(),
+                'order_column' => 1
+            ]);
+        }
+        return $mediaLibrary;
+    }
+
+    public function deleteMedia(Media $media)
     {
         $filePath = "{$media->collection_name}/{$media->media_id}/{$media->file_name}";
 
@@ -39,7 +56,4 @@ class MediaService {
 
         return $media->delete();
     }
-
-
-
 }

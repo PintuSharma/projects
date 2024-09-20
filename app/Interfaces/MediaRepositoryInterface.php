@@ -2,10 +2,11 @@
 
 namespace App\Interfaces;
 
+use Illuminate\Http\UploadedFile;
+use App\Models\Media;
+
 interface MediaRepositoryInterface
 {
-    public function upload($file, $collectionName);
-    public function delete($mediaId);
-    public function find($mediaId);
-    public function getAll($collectionName);
+    public function store(array $data);
+    public function delete($id);
 }
