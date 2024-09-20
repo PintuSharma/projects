@@ -15,19 +15,6 @@ class StoreProjectRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Prepare the data for validation.
-     * This ensures that a single file is converted into an array to make validation consistent.
-     */
-    protected function prepareForValidation()
-    {
-        if ($this->hasFile('files') && !is_array($this->file('files'))) {
-            $this->merge([
-                'files' => [$this->file('files')],
-            ]);
-        }
-    }
-
 
     /**
      * Get the validation rules that apply to the request.
