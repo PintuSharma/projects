@@ -72,7 +72,7 @@ class MediaService
             Storage::disk($media->disk)->delete($filePath);
         }
 
-        return $media->delete();
+        return $this->mediaRepositoryInterface->delete($media->id);
     }
 
 

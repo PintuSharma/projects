@@ -25,6 +25,15 @@ class ProjectRepository implements ProjectRepositoryInterface
     }
 
     /**
+     * Summary of find
+     * @param mixed $id
+     * @return \App\Models\Project
+     */
+    public function find($id): Project{
+        return Project::findOrFail($id);
+    }
+
+    /**
      * Summary of store
      * @param array $data
      * @return Project
