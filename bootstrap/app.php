@@ -15,5 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        
+        $exceptions->renderable(function (Throwable $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'data' => $e->getMessage(),
+                    'message'=>'Something went wrong',
+                    'status'=>false,
+                ], $e->getStatusCode());
+            }
+        });
     })->create();

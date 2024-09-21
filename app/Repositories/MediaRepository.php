@@ -7,26 +7,29 @@ use App\Interfaces\MediaRepositoryInterface;
 
 class MediaRepository implements MediaRepositoryInterface
 {
+    
     /**
-     * Create a new class instance.
+     * Summary of __construct
      */
     public function __construct()
     {
         //
     }
-
-    public function index(){
-        return Media::paginate();
-    }
-
-    public function store(array $data){
+   
+    /**
+     * Summary of store
+     * @param array $data
+     * @return \App\Models\Media
+     */
+    public function store(array $data): Media{
        return Media::create($data);
     }
-
-    public function update(array $data,$id){
-       return Media::whereId($id)->update($data);
-    }
     
+    /**
+     * Summary of delete
+     * @param mixed $id
+     * @return void
+     */
     public function delete($id){
        Media::destroy($id);
     }

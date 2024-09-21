@@ -10,19 +10,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProjectResource;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use App\Interfaces\ProjectRepositoryInterface;
+use App\Interfaces\MediaRepositoryInterface;
+use App\Models\Media;
 use App\Services\ApiResponse;
 use App\Services\MediaService;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProjectController extends Controller
+class MediaController extends Controller
 {
 
     /**
      * Summary of projectRepository
-     * @var ProjectRepositoryInterface
+     * @var MediaRepositoryInterface
      */
-    private ProjectRepositoryInterface $projectRepository;
+    private MediaRepositoryInterface $mediaRepository;
 
     /**
      * Summary of mediaService
@@ -35,20 +36,18 @@ class ProjectController extends Controller
      * @param \App\Interfaces\ProjectRepositoryInterface $projectRepository
      * @param \App\Services\MediaService $mediaService
      */
-    public function __construct(ProjectRepositoryInterface $projectRepository, MediaService $mediaService)
+    public function __construct(MediaRepositoryInterface $mediaRepository, MediaService $mediaService)
     {
-        $this->projectRepository = $projectRepository;
+        $this->mediaRepository = $mediaRepository;
         $this->mediaService = $mediaService;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $data = $this->projectRepository->index();
-
-        return ApiResponse::sendResponse(ProjectResource::collection($data), '', Response::HTTP_OK);
+        
     }
 
 
@@ -77,47 +76,27 @@ class ProjectController extends Controller
     }
 
     
-    /**
-     * Summary of show
-     * @param \App\Models\Project $project
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show(Project $project): JsonResponse
+    
+    public function show(Project $project):
     {
-        return ApiResponse::sendResponse(new ProjectResource($project), '', Response::HTTP_OK);
+       
     }
 
     
-    /**
-     * Summary of update
-     * @param \App\Http\Requests\UpdateProjectRequest $request
-     * @param \App\Models\Project $project
-     * @return JsonResponse|mixed
-     */
-    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
+    public function update()
     {
-        DB::beginTransaction();
-        try {
-            $project->update($request->all());
-            DB::commit();
-            return ApiResponse::sendResponse(new ProjectResource($project), 'Project updated successfully', Response::HTTP_OK);
-
-        } catch (Exception $ex) {
-            return ApiResponse::rollback($ex);
-        }
-
+       
     }
 
    
     /**
      * Summary of destroy
-     * @param \App\Models\Project $project
+     * @param \App\Models\Media $media
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Project $project): JsonResponse
+    public function destroy(Media $media): JsonResponse
     {
-        $this->projectRepository->delete($project->id);
-        $this->mediaService->deleteMediaFiles($project);
-        return ApiResponse::sendResponse('Product Delete Successful', '', Response::HTTP_NO_CONTENT);
+        $this->mediaService->deleteMedia($media);
+        return ApiResponse::sendResponse('Media Delete Successful', '', Response::HTTP_NO_CONTENT);
     }
 }

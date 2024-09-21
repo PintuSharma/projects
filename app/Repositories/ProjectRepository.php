@@ -7,26 +7,47 @@ use App\Interfaces\ProjectRepositoryInterface;
 
 class ProjectRepository implements ProjectRepositoryInterface
 {
+    
     /**
-     * Create a new class instance.
+     * Summary of __construct
      */
     public function __construct()
     {
         //
     }
 
+    /**
+     * Summary of index
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function index(){
-        return Project::paginate();
+        return Project::all();
     }
 
-    public function store(array $data){
+    /**
+     * Summary of store
+     * @param array $data
+     * @return Project
+     */
+    public function store(array $data): Project{
        return Project::create($data);
     }
 
-    public function update(array $data,$id){
+    /**
+     * Summary of update
+     * @param array $data
+     * @param mixed $id
+     * @return mixed
+     */
+    public function update(array $data,$id): mixed{
        return Project::whereId($id)->update($data);
     }
     
+    /**
+     * Summary of delete
+     * @param mixed $id
+     * @return void
+     */
     public function delete($id){
        Project::destroy($id);
     }

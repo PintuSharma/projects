@@ -11,14 +11,35 @@ class Project extends Model
 {
     use HasFactory,HasUlids,SoftDeletes;
 
+    
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * Summary of fillable
+     * @var array
      */
     protected $fillable = [
         'name',
         'description',
         'price',
     ];
+
+
+    /**
+     * Summary of media
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function media(){
+        return $this->morphMany(Media::class, 'media');
+    }
+
+    /**
+     * Summary of boot
+     * @return void
+     */
+    protected static function boot() {
+        parent::boot();
+
+        static::deleting(function($project) { 
+             $project->media()->delete();
+        }); 
+    }
 }

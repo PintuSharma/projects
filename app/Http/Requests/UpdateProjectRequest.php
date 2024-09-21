@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateProjectRequest extends FormRequest
 {
@@ -22,21 +24,28 @@ class UpdateProjectRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules =  [
             'name'=>'required',
             'price'=>'required|numeric',
-            'files' => 'required',
-            'files.*' => 'required|file|mimes:jpeg,jpg,png,gif,mp4,avi,mov,wmv|max:10240'
         ];
+
+        return $rules;
     }
 
+    /**
+     * Summary of failedValidation
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     * @return never
+     */
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
         $response = response()->json([
             'success' => false,
-            'errors' => $validator->errors(),
-        ], 422);
+            'message'   => 'Validation errors',
+            'data' => $validator->errors(),
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
 
-        throw new \Illuminate\Validation\ValidationException($validator, $response);
+        throw new HttpResponseException($response);
     }
 }

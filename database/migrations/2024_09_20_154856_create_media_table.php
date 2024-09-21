@@ -20,9 +20,8 @@ return new class extends Migration
             $table->string('mime_type')->nullable();
             $table->string('disk');
             $table->unsignedBigInteger('size');
-            $table->unsignedInteger('order_column')->nullable()->index();
             $table->timestamps();
-
+            $table->softDeletes();
         });
     }
 
